@@ -5,16 +5,15 @@ from src.utils import softmax
 
 
 class Multinoulli:
-    def __init__(self, lr=0.01, max_iter=10000, min_step=1e-5, verbose=False):
+    def __init__(self, lr=0.1, max_iter=10000, min_step=1e-7, verbose=False):
         self.lr = lr
         self.max_iter = max_iter
         self.eps = min_step
         self.verbose = verbose
         self.losses = []
 
-    # def loss(self, y, eta):
-    #     stable_log = np.maximum(0, eta) + np.log(1 + np.exp(-np.abs(eta)))
-    #     return np.mean(-y * eta + stable_log)
+    def loss(self, Y, P):
+        return -np.mean(np.sum(Y * np.log(P + 1e-15), axis=1))
 
     def loss_plot(self, losses):
         plt.plot(losses)
@@ -28,10 +27,11 @@ class Multinoulli:
         for _ in range(self.max_iter):
             old_theta = self.theta.copy()
             eta = X @ self.theta.T
-            grad = Y - softmax(eta)
+            Phi = softmax(eta)
+            grad = Y - Phi
 
-            self.theta += self.lr * (grad.T @ X)
-            # self.losses.append(self.loss(Y, eta))
+            self.theta += (self.lr / X.shape[0]) * (grad.T @ X)
+            self.losses.append(self.loss(Y, Phi))
 
             if np.linalg.norm(self.theta - old_theta) < self.eps:
                 break
