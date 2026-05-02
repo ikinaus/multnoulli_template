@@ -5,11 +5,11 @@ from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
 
 
-def get_data(n_samples=1000, n_features=5, n_classes=3):
+def get_data(n_samples=1000, n_features=6, n_classes=5):
     X, y = make_classification(
         n_samples=n_samples,
         n_features=n_features,
-        n_informative=3,
+        n_informative=4,
         n_classes=n_classes,
         random_state=42,
     )
@@ -22,15 +22,17 @@ def get_data(n_samples=1000, n_features=5, n_classes=3):
     train_data = np.hstack((X_train, Y_train))
     test_data = np.hstack((X_test, Y_test))
 
-    return train_data, test_data
+    return train_data, test_data, n_features, n_classes
 
 
 def main():
     base_dir = Path(__file__).resolve().parent
     output_dir = base_dir.parent / "data" / "processed"
 
-    train_data, test_data = get_data(n_samples=5000)
-    cols = "x1,x2,x3,x4,x5,y1,y2,y3"
+    train_data, test_data, nx, ny = get_data(n_samples=10000)
+    x_cols = [f"x{col}" for col in range(1, nx + 1)]
+    y_cols = [f"y{col}" for col in range(1, ny + 1)]
+    cols = ",".join((x_cols + y_cols))
 
     save_configs = [("ds_train.csv", train_data), ("ds_test.csv", test_data)]
 
